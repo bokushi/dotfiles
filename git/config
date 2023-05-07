@@ -1,0 +1,11 @@
+[user]
+        name = bokushi
+[commit]
+        verbose = true
+[log]
+        abbrevCommit = true
+        date = relative
+[init]
+        defaultBranch = main
+[alias]
+        logg = log --graph

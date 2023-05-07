@@ -1,0 +1,20 @@
+#set bell-style visible
+set show-all-if-ambiguous On
+set blink-matching-paren On
+set colored-completion-prefix On
+set colored-stats On
+set editing-mode vi
+set show-mode-in-prompt On
+# 補完の候補の数が多すぎても，表示するかどうかを聞かないようにする
+# set completion-query-items -1
+set vi-ins-mode-string \1\e[5 q\2
+set vi-cmd-mode-string \1\e[1 q\2
+set completion-ignore-case On
+set completion-map-case On
+set Mark-symlinked-directories On
+# 補完された部分が10文字以上の場合は，「...」で省略する
+# set completion-prefix-display-length 10
+
+"\C-l": clear-screen
+
+set keyseq-timeout 5
