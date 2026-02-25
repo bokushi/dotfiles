@@ -1,0 +1,190 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# some more ls aliases
+#alias ll='ls -l'
+#alias la='ls -A'
+#alias l='ls -CF'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+shopt -s autocd cdable_vars cdspell checkjobs dirspell dotglob xpg_echo failglob lithist
+trap 'echo -ne "\e[1 q"' DEBUG
+
+HISTTIMEFORMAT='%F %a %T  '
+HISTCONTROL=ignoreboth
+
+export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CACHE_HOME=$HOME/.cache
+export INPUTRC=$XDG_CONFIG_HOME/readline/.inputrc
+export DOCKER_CONFIG=$XDG_CONFIG_HOME/docker
+
+export LESS="--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --LINE-NUMBERS --RAW-CONTROL-CHARS --HILITE-UNREAD --tabs=4 --incsearch --modelines=2 --mouse --use-color --save-marks --status-line --wheel-lines=3 --status-col-width=1 --line-num-width=6" 
+
+git_pre_ps1=$(echo "$PS1" | sed -e "s/\\\\$\s*\$//")
+PROMPT_COMMAND="__git_ps1 \"$git_pre_ps1\" \"\\\$ \""
+
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWSTASHSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM="auto"
+GIT_PS1_DESCRIBE_STYLE="branch"
+GIT_PS1_SHOWCONFLICTSTATE="yes"
+GIT_PS1_SHOWCOLORHINTS=1
+
+# pnpm
+export PNPM_HOME="/home/kubo/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+###-begin-pnpm-completion-###
+if type complete &>/dev/null; then
+  _pnpm_completion () {
+    local words cword
+    if type _get_comp_words_by_ref &>/dev/null; then
+      _get_comp_words_by_ref -n = -n @ -n : -w words -i cword
+    else
+      cword="$COMP_CWORD"
+      words=("${COMP_WORDS[@]}")
+    fi
+
+    local si="$IFS"
+    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$cword" \
+                           COMP_LINE="$COMP_LINE" \
+                           COMP_POINT="$COMP_POINT" \
+                           SHELL=bash \
+                           pnpm completion-server -- "${words[@]}" \
+                           2>/dev/null)) || return $?
+    IFS="$si"
+
+    if [ "$COMPREPLY" = "__tabtab_complete_files__" ]; then
+      COMPREPLY=($(compgen -f -- "$cword"))
+    fi
+
+    if type __ltrim_colon_completions &>/dev/null; then
+      __ltrim_colon_completions "${words[cword]}"
+    fi
+  }
+  complete -o default -F _pnpm_completion pnpm
+fi
+###-end-pnpm-completion-###
+
+_node_complete() {
+  local cur_word options
+  cur_word="${COMP_WORDS[COMP_CWORD]}"
+  if [[ "${cur_word}" == -* ]] ; then
+    COMPREPLY=( $(compgen -W '--run --experimental-sea-config --cpu-prof-dir --report-on-signal --heap-prof-interval --cpu-prof-interval --cpu-prof --tls-max-v1.3 --test-udp-no-try-send --test-skip-pattern --use-env-proxy --experimental-report --experimental-modules --experimental-addon-modules --test-coverage-functions --heapsnapshot-signal --trace-tls --permission --experimental-loader --experimental-global-webcrypto --test-coverage-exclude --trace-env --test-rerun-failures --experimental-detect-module --allow-addons --http-parser --experimental-fetch --trace-promises --experimental-abortcontroller --test-concurrency --experimental-quic --disable-sigusr1 --experimental-inspector-network-resource --allow-wasi --expose-gc --diagnostic-dir --force-async-hooks-checks --strip-types --experimental-sqlite --allow-inspector --debug --allow-fs-read --build-snapshot --preserve-symlinks-main --allow-fs-write --allow-child-process --print --allow-worker --inspect-publish-uid --inspect-brk --check --inspect --inspect-port --experimental-top-level-await --experimental-json-modules --enable-etw-stack-walking --max-old-space-size --perf-basic-prof --inspect-wait --perf-prof --experimental-transform-types --report-uncaught-exception --cpu-prof-name --env-file-if-exists --pending-deprecation --dns-result-order --test-only --tls-min-v1.2 --max-old-space-size-percentage --build-snapshot-config --network-family-autoselection --report-signal --abort-on-uncaught-exception --test-force-exit --test-coverage-lines --throw-deprecation --trace-deprecation --eval --heap-prof-dir --trace-env-native-stack --report-exclude-network --disable-wasm-trap-handler --snapshot-blob --unhandled-rejections --watch --test-isolation --entry-url --openssl-shared-config --conditions --help --security-revert --watch-path --tls-cipher-list --disable-proto --test-coverage-include --env-file --experimental-network-inspection --zero-fill-buffers --experimental-webstorage --openssl-legacy-provider --v8-pool-size --force-fips --experimental-shadow-realm --async-context-frame --preserve-symlinks --completion-bash --test-reporter-destination --trace-env-js-stack --trace-event-file-pattern --secure-heap-min --trace-event-categories --addons --node-memory-debug --experimental-specifier-resolution --v8-options --global-search-paths --experimental-global-customevent --experimental-test-module-mocks --trace-sync-io --debug-arraybuffer-allocations --report-compact --experimental-test-coverage --trace-exit --trace-warnings --watch-kill-signal --experimental-test-snapshots --prof-process --experimental-repl-await --tls-min-v1.3 --experimental-websocket --enable-fips --test-global-setup --report-on-fatalerror --node-snapshot --icu-data-dir --trace-uncaught --openssl-config --report-filename --interpreted-frames-native-stack --trace-require-module --experimental-import-meta-resolve --experimental-wasm-modules --use-openssl-ca --perf-basic-prof-only-functions --experimental-print-required-tla --experimental-worker --use-bundled-ca --test-shard --experimental-global-navigator --tls-min-v1.1 --use-system-ca --warnings --test-name-pattern --verify-base-objects --use-largepages --experimental-eventsource --test-reporter --secure-heap --test-coverage-branches --test-update-snapshots --trace-sigint --import --test --localstorage-file --experimental-config-file --track-heap-objects --redirect-warnings --max-http-header-size --experimental-default-config-file --experimental-require-module --heap-prof --test-timeout --experimental-worker-inspection --experimental-vm-modules --report-dir --network-family-autoselection-attempt-timeout --heap-prof-name --version --frozen-intrinsics --harmony-shadow-realm --interactive --experimental-wasi-unstable-preview1 --watch-preserve-output --insecure-http-parser --force-node-api-uncaught-exceptions-policy --prof --report-exclude-env --expose-internals --require --tls-keylog --napi-modules --stack-trace-limit --extra-info-on-fatal-exception --debug-brk --tls-max-v1.2 --enable-source-maps --jitless --input-type --disable-warning --heapsnapshot-near-heap-limit --title --disallow-code-generation-from-strings --max-semi-space-size --force-context-aware --perf-prof-unwinding-info --tls-min-v1.0 --inspect-brk-node --deprecation --experimental-test-isolation --prof-process -pe --enable-network-family-autoselection -i --inspect-wait= --inspect-brk= --debug-brk= --debug= --inspect= --loader --debug-port --trace-events-enabled -v --security-reverts --print <arg> --es-module-specifier-resolution -h --report-directory -p --inspect-brk-node= -c -r -e --experimental-strip-types -C' -- "${cur_word}") )
+    return 0
+  else
+    COMPREPLY=( $(compgen -f "${cur_word}") )
+    return 0
+  fi
+}
+complete -o filenames -o nospace -o bashdefault -F _node_complete node node_g
