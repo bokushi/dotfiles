@@ -1,0 +1,27 @@
+source $VIMRUNTIME/debian.vim
+
+"https://vimhelp.org/options.txt.html#%27ambiwidth%27
+"when a CJK font is used for GUI Vim or Vim is running inside a terminal (emulators) that uses a CJK font (or Vim is run inside an xterm invoked with "-cjkwidth" option.), this option should be set to "double" to match the width perceived by Vim with the width of glyphs in the font.
+"set ambiwidth=double
+
+set autoindent
+
+"When a file has been detected to have been changed outside of Vim and it has not been changed inside of Vim, automatically read it again.
+set autoread
+
+set backupdir=$XDG_CACHE_HOME/vim//,~/.cache/vim//
+
+set backupext=.bak
+
+set number
+set fileencodings=ucs-bom,utf-8,default,euc-jp,sjis,latin1
+set expandtab
+set tabstop=4
+set shiftwidth=0
+set ignorecase
+set smartcase
+set incsearch
+set laststatus=2
+behave mswin
+set mouse=a
+set wildoptions+=pum
