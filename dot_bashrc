@@ -96,10 +96,13 @@ HISTFILESIZE=2000
 
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
+export XDG_STATE_HOME=$HOME/.local/state
 export INPUTRC=$XDG_CONFIG_HOME/readline/.inputrc
 export DOCKER_CONFIG=$XDG_CONFIG_HOME/docker
 
 export CLAUDE_CONFIG_DIR=$XDG_CONFIG_HOME/claude
+HISTFILE=$XDG_STATE_HOME/bash_history
+export NODE_REPL_HISTORY=$XDG_STATE_HOME/node_repl_history
 
 export LESS="--quit-if-one-screen --ignore-case --status-column --LONG-PROMPT --LINE-NUMBERS --RAW-CONTROL-CHARS --HILITE-UNREAD --tabs=4 --incsearch --modelines=2 --mouse --use-color --save-marks --status-line --wheel-lines=3 --status-col-width=1 --line-num-width=6"
 
