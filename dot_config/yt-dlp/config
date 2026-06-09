@@ -1,0 +1,7 @@
+--update-to nightly
+--js-runtimes node
+--impersonate ""
+--concurrent-fragments 999
+--console-title
+--verbose
+--audio-quality 0
